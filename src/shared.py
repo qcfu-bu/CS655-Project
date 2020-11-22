@@ -1,5 +1,5 @@
 import json
-from typing import NamedTuple, List, Union, Any
+from typing import NamedTuple, List, Any, Union
 
 
 # ========================== Address ==========================
@@ -22,31 +22,30 @@ WORKER_ADDRESSES: List[Address] = [
 MSG_TYPE_NAME = "msg_type"
 
 
-# a generic message type
-class Message (NamedTuple):
-    pass
-
-
 # to ping the worker when there is a new task
-class NewTaskToWorkerMsg(Message):
+class NewTaskToWorkerMsg(NamedTuple):
     pass
 
 
 # the respond from worker stating how many task it currently have
-class WorkerTaskNumMsg(Message):
+class WorkerTaskNumMsg(NamedTuple):
     task_num: int
     accepting_task: bool
 
 
 # to send a task to the worker
-class TaskAssignmentMsg(Message):
+class TaskAssignmentMsg(NamedTuple):
     img_file_name: str
     task_id: int
 
 
 # the message when a worker finished with a task
-class TaskFinishedMsg(Message):
+class TaskFinishedMsg(NamedTuple):
     task_id: int
+
+
+Message = Union[NewTaskToWorkerMsg, WorkerTaskNumMsg,
+                TaskAssignmentMsg, TaskFinishedMsg]
 
 
 # === My deepest apology to the younger purer me.
@@ -58,9 +57,10 @@ def gen_message(msg: Message) -> str:
     :param msg: the input message
     :return: a json encoding of the input message
     """
-    return json.dumps(
-        msg._asdict().update({MSG_TYPE_NAME: type(msg).__name__})
-    )
+    msg_dict = msg._asdict()
+    msg_dict.update({MSG_TYPE_NAME: type(msg).__name__})
+
+    return json.dumps(msg_dict)
 
 
 def __parse_message_as(msg_type: type, msg_str: str) -> Any:
@@ -74,9 +74,6 @@ def __parse_message_as(msg_type: type, msg_str: str) -> Any:
     # parse the message
     msg_dict = json.loads(msg_str)
 
-    # the msg_type provided needs to be a sub type of the generics Message type
-    assert issubclass(msg_type, Message), \
-        "the msg_type provided is not a subtype of Message"
     # the type specified in the message needs to match
     # the type we are parsing as
     assert msg_dict[MSG_TYPE_NAME] == msg_type.__name__, \
