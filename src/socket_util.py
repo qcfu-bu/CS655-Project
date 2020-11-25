@@ -24,14 +24,14 @@ def receive_data_from(connection: socket.socket) -> bytes:
             total_recv = total_recv + cur_recv
 
 
-def send_message(connection: socket.socket, msg: bytes) -> bytes:
+def send_message(connection: socket.socket, msg: str) -> str:
     """Send a generic message to the server
 
     :param connection: an accepted connection
     :param msg: the message to send
     :return: the raw data received from server
     """
-    connection.sendall(msg)
+    connection.sendall(msg.encode(ENCODING) + MSG_ENDING_CHAR)
     data_recv = receive_data_from(connection)
 
-    return data_recv
+    return data_recv.decode(ENCODING)
