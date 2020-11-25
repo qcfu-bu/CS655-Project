@@ -1,22 +1,8 @@
+# code related to typing and utilises for
+# messages between the interface and worker
 import json
-from typing import NamedTuple, List, Any, Union
+from typing import NamedTuple, Union, Any
 
-
-# ========================== Address ==========================
-
-# address of a worker, includes a ip address and a port number
-class Address(NamedTuple):
-    ip: str
-    port: int
-
-
-# list of worker addresses
-WORKER_ADDRESSES: List[Address] = [
-
-]
-
-
-# ========================== Message ==========================
 
 # the key for message type in the json
 MSG_TYPE_NAME = "msg_type"
@@ -120,3 +106,4 @@ def parse_task_finished_msg(msg_str: str) -> TaskFinishedMsg:
     to provide the type information
     """
     return __parse_message_as(TaskFinishedMsg, msg_str)
+
