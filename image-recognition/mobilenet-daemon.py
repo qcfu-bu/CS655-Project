@@ -9,6 +9,7 @@ from tensorflow import keras
 from tensorflow.keras.applications.imagenet_utils import decode_predictions
 
 parser = argparse.ArgumentParser('tensorflow daemon')
+parser.add_argument('-i', help='IP of tensorflow daemon', default='localhost')
 parser.add_argument('-p', help='PORT of tensorflow daemon',
                     type=int, default=5001)
 
@@ -34,7 +35,7 @@ def predict(data):
     return result
 
 
-TCP_IP = 'localhost'
+TCP_IP = args.i
 TCP_PORT = args.p
 
 
