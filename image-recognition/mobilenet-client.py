@@ -18,6 +18,8 @@ args = parser.parse_args()
 TCP_IP = args.i
 TCP_PORT = args.p
 
+print('connecting to tensorflow daemon:', TCP_IP, TCP_PORT)
+
 
 def binary_to_dict(the_binary):
     jsn = ''.join(chr(int(x, 2)) for x in the_binary.split())
