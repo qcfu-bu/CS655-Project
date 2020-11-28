@@ -2,10 +2,17 @@ import socket
 import struct
 import threading
 import json
+import argparse
 import numpy as np
 
 from tensorflow import keras
 from tensorflow.keras.applications.imagenet_utils import decode_predictions
+
+parser = argparse.ArgumentParser('tensorflow daemon')
+parser.add_argument('-p', help='PORT of tensorflow daemon',
+                    type=int, default=5001)
+
+args = parser.parse_args()
 
 
 model = keras.applications.MobileNetV2(weights='imagenet')
@@ -28,7 +35,7 @@ def predict(data):
 
 
 TCP_IP = 'localhost'
-TCP_PORT = 5001
+TCP_PORT = args.p
 
 
 def dict_to_binary(the_dict):
