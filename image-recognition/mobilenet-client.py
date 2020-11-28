@@ -2,19 +2,21 @@ import os
 import socket
 import struct
 import json
+import argparse
 import numpy as np
 
 from PIL import Image
 
-TCP_IP = 'localhost'
-TCP_PORT = 5001
+parser = argparse.ArgumentParser('tensorflow client')
+parser.add_argument('-i', help='IP of tensorflow daemon', default='localhost')
+parser.add_argument('-p', help='PORT of tensorflow daemon',
+                    type=int, default=5001)
+parser.add_argument('-d', help='images to recognize', required=True)
 
-sock = socket.socket()
-sock.connect((TCP_IP, TCP_PORT))
+args = parser.parse_args()
 
-local_dir = "img"
-files = [os.path.join(dp, f) for dp, dn, filenames in os.walk(
-    local_dir) for f in filenames]
+TCP_IP = args.i
+TCP_PORT = args.p
 
 
 def binary_to_dict(the_binary):
@@ -23,7 +25,15 @@ def binary_to_dict(the_binary):
     return d
 
 
+local_dir = args.d
+files = [os.path.join(dp, f) for dp, dn, filenames in os.walk(
+    local_dir) for f in filenames]
+
+
 for file in files:
+    sock = socket.socket()
+    sock.connect((TCP_IP, TCP_PORT))
+
     img = Image.open(file)
     img = img.resize((224, 224))
 
@@ -50,4 +60,4 @@ for file in files:
     prediction = binary_to_dict(data)
     print(prediction)
 
-sock.close()
+    sock.close()
