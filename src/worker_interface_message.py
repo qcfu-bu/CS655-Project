@@ -19,9 +19,8 @@ class WorkerTaskNumMsg(NamedTuple):
     accepting_task: bool
 
 
-# to send a task to the worker
-class TaskAssignmentMsg(NamedTuple):
-    img_file_name: str
+# the preparation for sending a file in the message.
+class PreTaskAssignmentMsg(NamedTuple):
     task_id: int
 
 
@@ -31,7 +30,7 @@ class TaskFinishedMsg(NamedTuple):
 
 
 Message = Union[NewTaskToWorkerMsg, WorkerTaskNumMsg,
-                TaskAssignmentMsg, TaskFinishedMsg]
+                PreTaskAssignmentMsg, TaskFinishedMsg]
 
 
 # === My deepest apology to the younger purer me.
@@ -90,13 +89,13 @@ def parse_worker_task_num_msg(msg_str: str) -> WorkerTaskNumMsg:
     return __parse_message_as(WorkerTaskNumMsg, msg_str)
 
 
-def parse_task_assignment_msg(msg_str: str) -> TaskAssignmentMsg:
+def parse_pre_task_assignment_msg(msg_str: str) -> PreTaskAssignmentMsg:
     """parse a task assignment message
 
     This is just a wrapper for `__parse_message_as`
     to provide the type information
     """
-    return __parse_message_as(TaskAssignmentMsg, msg_str)
+    return __parse_message_as(PreTaskAssignmentMsg, msg_str)
 
 
 def parse_task_finished_msg(msg_str: str) -> TaskFinishedMsg:
