@@ -9,7 +9,7 @@ ENCODING = 'utf-8'  # use utf-8 for text encoding
 MSG_ENDING_CHAR = b'\n'  # this char signifies the ending of a message
 
 
-def receive_data_from(connection: socket.socket) -> bytes:
+def receive_msg_from(connection: socket.socket) -> str:
     """receiving data from the connection
 
     :param connection: a accepted socket connection
@@ -19,19 +19,48 @@ def receive_data_from(connection: socket.socket) -> bytes:
     while True:
         cur_recv: bytes = connection.recv(DATA_CAP)
         if cur_recv.endswith(MSG_ENDING_CHAR):
-            return total_recv + cur_recv
+            total_recv = total_recv + cur_recv
+            break
         else:
             total_recv = total_recv + cur_recv
 
+    return total_recv.decode(ENCODING)
 
-def send_message(connection: socket.socket, msg: str) -> str:
+
+def send_msg_to(connection: socket.socket, msg: str) -> None:
     """Send a generic message to the server
 
     :param connection: an accepted connection
     :param msg: the message to send
-    :return: the raw data received from server
     """
     connection.sendall(msg.encode(ENCODING) + MSG_ENDING_CHAR)
-    data_recv = receive_data_from(connection)
 
-    return data_recv.decode(ENCODING)
+
+def send_file_to(connection: socket.socket, send_file_name: str) -> None:
+    """send a file through the connection
+
+    :param connection: the connection to send to
+    :param send_file_name: the name of the file to send
+    """
+    with open(send_file_name, 'rb') as f:
+        file_content = b'\n'.join(f.readlines())
+        connection.send(file_content)
+
+
+def receive_file_from(connection: socket.socket, save_file_name: str) -> None:
+    """Receives a file from the connection
+
+    :param connection: the connection to receive file from
+    :param save_file_name: the file name to save
+    """
+    with open(save_file_name, 'wb') as f:
+
+        # keeps receiving and write to file until there is nothing else
+        # to receive.
+        while True:
+            data_recv = connection.recv(DATA_CAP)
+            if data_recv == b"":
+                break
+
+            # write the currently received data to file
+            f.write(data_recv)
