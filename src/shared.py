@@ -1,7 +1,7 @@
 # code related to typing and utilises for
 # messages between the interface and worker
 import json
-from typing import NamedTuple, Union, Any, List
+from typing import NamedTuple, Union, Any, List, Dict
 
 
 # address of a worker, includes a ip address and a port number
@@ -22,7 +22,7 @@ WORKER_ADDRESSES: List[Address] = [
 ]
 
 
-TaskID = int
+IRResult = Dict[str, float]
 
 
 # to ping the worker when there is a new task
@@ -36,14 +36,9 @@ class WorkerTaskNumMsg(NamedTuple):
     accepting_task: bool
 
 
-# the preparation for sending a file in the message.
-class PreTaskAssignmentMsg(NamedTuple):
-    task_id: TaskID
-
-
 # the message when a worker finished with a task
-class TaskFinishedMsg(NamedTuple):
-    task_id: TaskID
+class IRResultMsg(NamedTuple):
+    result: IRResult
 
 
 # This is a place holder response to indicate that
@@ -55,7 +50,7 @@ class SuccessRespondMsg(NamedTuple):
 
 
 Message = Union[NewTaskToWorkerMsg, WorkerTaskNumMsg,
-                PreTaskAssignmentMsg, TaskFinishedMsg, SuccessRespondMsg]
+                IRResultMsg, SuccessRespondMsg]
 
 # === My deepest apology to the younger purer me.
 # === here comes the hacks:
@@ -117,22 +112,13 @@ def parse_worker_task_num_msg(msg_str: str) -> WorkerTaskNumMsg:
     return __parse_message_as(WorkerTaskNumMsg, msg_str)
 
 
-def parse_pre_task_assignment_msg(msg_str: str) -> PreTaskAssignmentMsg:
-    """parse a task assignment message
+def parse_ir_result_msg(msg_str: str) -> IRResultMsg:
+    """parse the image recognition result
 
     This is just a wrapper for `__parse_message_as`
     to provide the type information
     """
-    return __parse_message_as(PreTaskAssignmentMsg, msg_str)
-
-
-def parse_task_finished_msg(msg_str: str) -> TaskFinishedMsg:
-    """parse a task finished message
-
-    This is just a wrapper for `__parse_message_as`
-    to provide the type information
-    """
-    return __parse_message_as(TaskFinishedMsg, msg_str)
+    return __parse_message_as(IRResultMsg, msg_str)
 
 
 def parse_success_respond_msg(msg_str: str) -> SuccessRespondMsg:
