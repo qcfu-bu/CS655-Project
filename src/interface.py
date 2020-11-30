@@ -3,11 +3,11 @@
 # and it will communicate with the server to assign file.
 import socket
 import random
-from typing import Optional, NamedTuple, Dict, Set
+from typing import Optional, NamedTuple, Dict, Set, List, Tuple
 
 from .socket_util import receive_msg_from, send_msg_to, send_file_to
-from .shared import Address, \
-    gen_message, parse_worker_task_num_msg,  \
+from .shared import Address, WORKER_ADDRESSES, \
+    gen_message, parse_worker_task_num_msg, \
     NewTaskToWorkerMsg, parse_ir_result_msg, IRResult
 
 
@@ -42,8 +42,9 @@ def get_worker_task_num(worker_address: Address) -> Optional[int]:
             return None
 
 
-def assign_task_to(worker_address: Address, task_file_name: str) -> IRResult:
-    """Assign a specific task to a given worker
+def image_recognition_with_worker(worker_address: Address,
+                                  task_file_name: str) -> IRResult:
+    """let a specific worker finish a image recognition task
 
     :param worker_address: the address of the worker to assign to
     :param task_file_name: the file name of the task
@@ -65,3 +66,31 @@ def assign_task_to(worker_address: Address, task_file_name: str) -> IRResult:
         return ir_result_msg.result
 
 
+def image_recognition(task_file_name: str) -> IRResult:
+    """Let the desirable worker finish the given image recognition task
+
+    :param task_file_name: the input file to recognize
+    :return: the image recognition result
+    """
+
+    # get all the task num of all the workers
+    workers_with_task_nums = [(worker_addr, get_worker_task_num(worker_addr))
+                              for worker_addr in WORKER_ADDRESSES]
+
+    # filter out those who did not successfully return the result
+    success_worker_task_nums: List[Tuple[Address, int]] = [
+        (worker_addr, worker_task_num)
+        for (worker_addr, worker_task_num) in workers_with_task_nums
+        if worker_task_num is not None
+    ]
+
+    # get the worker with the least number of tasks (least_task_worker)
+    worker_with_least_task_num = min(
+        success_worker_task_nums,
+        # only compare the task nums
+        key=lambda worker_with_task_num: worker_with_task_num[1]
+    )
+    (least_task_worker, _) = worker_with_least_task_num
+
+    # do the image recognition with the least task worker
+    return image_recognition_with_worker(least_task_worker, task_file_name)
