@@ -1,11 +1,28 @@
 # code related to typing and utilises for
 # messages between the interface and worker
 import json
-from typing import NamedTuple, Union, Any
+from typing import NamedTuple, Union, Any, List
 
 
-# the key for message type in the json
-MSG_TYPE_NAME = "msg_type"
+# address of a worker, includes a ip address and a port number
+class Address(NamedTuple):
+    ip: str
+    port: int
+
+
+# the server address for interface
+# if it is localhost, then it is for testing purpose.
+INTERFACE_ADDRESS = Address("localhost", 5000)
+
+# list of worker addresses
+# if it is localhost, then it is for testing purpose.
+WORKER_ADDRESSES: List[Address] = [
+    Address("localhost", 69),
+    Address("localhost", 420)
+]
+
+
+TaskID = int
 
 
 # to ping the worker when there is a new task
@@ -21,20 +38,31 @@ class WorkerTaskNumMsg(NamedTuple):
 
 # the preparation for sending a file in the message.
 class PreTaskAssignmentMsg(NamedTuple):
-    task_id: int
+    task_id: TaskID
 
 
 # the message when a worker finished with a task
 class TaskFinishedMsg(NamedTuple):
-    task_id: int
+    task_id: TaskID
+
+
+# This is a place holder response to indicate that
+# the message sent has been successfully received.
+# without this message,
+# the server will possibly fail to distinguish two sequentially sent messages
+class SuccessRespondMsg(NamedTuple):
+    pass
 
 
 Message = Union[NewTaskToWorkerMsg, WorkerTaskNumMsg,
-                PreTaskAssignmentMsg, TaskFinishedMsg]
-
+                PreTaskAssignmentMsg, TaskFinishedMsg, SuccessRespondMsg]
 
 # === My deepest apology to the younger purer me.
 # === here comes the hacks:
+
+# the key for message type in the json
+MSG_TYPE_NAME = "msg_type"
+
 
 def gen_message(msg: Message) -> str:
     """ Generate a string message from the given message
@@ -106,3 +134,11 @@ def parse_task_finished_msg(msg_str: str) -> TaskFinishedMsg:
     """
     return __parse_message_as(TaskFinishedMsg, msg_str)
 
+
+def parse_success_respond_msg(msg_str: str) -> SuccessRespondMsg:
+    """parse a task finished message
+
+    This is just a wrapper for `__parse_message_as`
+    to provide the type information
+    """
+    return __parse_message_as(SuccessRespondMsg, msg_str)
