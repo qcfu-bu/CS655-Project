@@ -1,2 +1,2 @@
-UPLOAD_FOLDER = './uploaded_files'
+UPLOAD_FOLDER = 'website/uploaded_files'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
