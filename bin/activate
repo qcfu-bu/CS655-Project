@@ -36,8 +36,7 @@ deactivate () {
 
 # unset irrelevant variables
 deactivate nondestructive
-
-VIRTUAL_ENV="/Users/linaqiu/Google_Drive/Sync/course/cs655/project/CS655-Project"
+VIRTUAL_ENV="$(dirname "$(pwd)")"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
