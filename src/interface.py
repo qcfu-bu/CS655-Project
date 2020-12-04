@@ -49,7 +49,6 @@ def image_recognition_with_worker(worker_address: Address,
     :param worker_address: the address of the worker to assign to
     :param task_file_name: the file name of the task
     """
-    # TODO: timeout?
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as conn:
         # connecting with the worker
         conn.connect((worker_address.ip, worker_address.port))
