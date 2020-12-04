@@ -3,6 +3,8 @@ import socket
 
 K = 1024
 
+TIMEOUT_TIME = 10  # seconds
+
 DATA_CAP = 1 * K  # data to send in a single packet
 ENCODING = 'utf-8'  # use utf-8 for text encoding
 
@@ -15,6 +17,9 @@ def receive_msg_from(connection: socket.socket) -> str:
     :param connection: a accepted socket connection
     :return: raw message that ends with \n
     """
+    # setting the timeout time
+    connection.settimeout(TIMEOUT_TIME)
+
     total_recv = b""
     while True:
         cur_recv: bytes = connection.recv(DATA_CAP)
@@ -33,6 +38,9 @@ def send_msg_to(connection: socket.socket, msg: str) -> None:
     :param connection: an accepted connection
     :param msg: the message to send
     """
+    # setting the timeout time
+    connection.settimeout(TIMEOUT_TIME)
+
     connection.sendall(msg.encode(ENCODING) + MSG_ENDING_CHAR)
 
 
@@ -42,6 +50,9 @@ def send_file_to(connection: socket.socket, send_file_name: str) -> None:
     :param connection: the connection to send to
     :param send_file_name: the name of the file to send
     """
+    # setting the timeout time
+    connection.settimeout(TIMEOUT_TIME)
+
     with open(send_file_name, 'rb') as f:
         file_content = b'\n'.join(f.readlines())
         connection.send(file_content)
@@ -53,6 +64,9 @@ def receive_file_from(connection: socket.socket, save_file_name: str) -> None:
     :param connection: the connection to receive file from
     :param save_file_name: the file name to save
     """
+    # setting the timeout time
+    connection.settimeout(TIMEOUT_TIME)
+
     with open(save_file_name, 'wb') as f:
 
         # keeps receiving and write to file until there is nothing else

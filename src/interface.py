@@ -23,7 +23,6 @@ def get_worker_task_num(worker_address: Address) -> Optional[int]:
     # generate the message to pin the worker
     new_task_msg = NewTaskToWorkerMsg()
 
-    # TODO: timeout?
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as conn:
         # connecting with the worker
         conn.connect((worker_address.ip, worker_address.port))
