@@ -12,10 +12,18 @@ WORKER_ADDRESS = Address("localhost", 96)
 
 
 def image_recognition(file_name: str) -> IRResult:
+    """Perform the image recognition on the given file
+
+    :param file_name: the name of the file to recognize
+    """
     pass
 
 
 def run_ir_protocol(conn: socket.socket) -> None:
+    """perform the image recognition protocol with the manager
+
+    :param conn: the connection to the manager
+    """
     with conn:
         print("connected, executing IR"),
 
@@ -36,11 +44,19 @@ def run_ir_protocol(conn: socket.socket) -> None:
 
 
 def run_ir_server():
+    """Run the image recognition server on the worker.
+
+    This will get the task from the manager, perform image recognition on them,
+    and return the result back to the manager
+    """
     print("Preparing Server")
+
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        # start the server on the worker address given
         s.bind((WORKER_ADDRESS.ip, WORKER_ADDRESS.port))
         print("Server started on", WORKER_ADDRESS.ip,
               "port:", WORKER_ADDRESS.port)
+
         while True:
             s.listen()
 
