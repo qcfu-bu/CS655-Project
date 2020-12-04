@@ -73,7 +73,7 @@ def receive_file_from(connection: socket.socket, save_file_name: str) -> None:
         # to receive.
         while True:
             data_recv = connection.recv(DATA_CAP)
-            if data_recv == b"":
+            if len(data_recv) < DATA_CAP:
                 break
 
             # write the currently received data to file
