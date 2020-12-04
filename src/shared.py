@@ -36,6 +36,12 @@ class WorkerTaskNumMsg(NamedTuple):
     accepting_task: bool
 
 
+# this message is send before the image,
+# to contain information about this task assignment
+class TaskAssignMessage(NamedTuple):
+    file_name: str
+
+
 # the message when a worker finished with a task
 class IRResultMsg(NamedTuple):
     result: IRResult
@@ -50,7 +56,7 @@ class SuccessRespondMsg(NamedTuple):
 
 
 Message = Union[NewTaskToWorkerMsg, WorkerTaskNumMsg,
-                IRResultMsg, SuccessRespondMsg]
+                IRResultMsg, SuccessRespondMsg, TaskAssignMessage]
 
 # === My deepest apology to the younger purer me.
 # === here comes the hacks:
@@ -110,6 +116,15 @@ def parse_worker_task_num_msg(msg_str: str) -> WorkerTaskNumMsg:
     to provide the type information
     """
     return __parse_message_as(WorkerTaskNumMsg, msg_str)
+
+
+def parse_task_assign_msg(msg_str: str) -> TaskAssignMessage:
+    """parse a task finished message
+
+    This is just a wrapper for `__parse_message_as`
+    to provide the type information
+    """
+    return __parse_message_as(TaskAssignMessage, msg_str)
 
 
 def parse_ir_result_msg(msg_str: str) -> IRResultMsg:

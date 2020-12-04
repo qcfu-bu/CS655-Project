@@ -8,7 +8,7 @@ from typing import Optional, NamedTuple, Dict, Set, List, Tuple
 from .socket_util import receive_msg_from, send_msg_to, send_file_to
 from .shared import Address, WORKER_ADDRESSES, \
     gen_message, parse_worker_task_num_msg, \
-    NewTaskToWorkerMsg, parse_ir_result_msg, IRResult
+    NewTaskToWorkerMsg, parse_ir_result_msg, IRResult, TaskAssignMessage, parse_success_respond_msg
 
 
 def get_worker_task_num(worker_address: Address) -> Optional[int]:
@@ -54,6 +54,14 @@ def image_recognition_with_worker(worker_address: Address,
         # connecting with the worker
         conn.connect((worker_address.ip, worker_address.port))
         print("connected to worker", (worker_address.ip, worker_address.port))
+
+        # send the task assignment message
+        send_msg_to(conn, gen_message(
+            TaskAssignMessage(file_name=task_file_name)
+        ))
+        success_msg_str = receive_msg_from(conn)
+        # validate the message
+        _ = parse_success_respond_msg(success_msg_str)
 
         # send the image for the task
         send_file_to(conn, task_file_name)
