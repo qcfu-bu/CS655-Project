@@ -4,7 +4,7 @@ import uuid
 
 from .socket_util import receive_file_from, send_msg_to, receive_msg_from
 
-from .shared import IRResult, Address, gen_message, IRResultMsg, parse_task_assign_msg
+from .shared import IRResult, Address, gen_message, IRResultMsg, parse_task_assign_msg, SuccessRespondMsg
 
 # the address of current worker
 # if it is localhost then it is for testing
@@ -32,6 +32,9 @@ def run_ir_protocol(conn: socket.socket) -> None:
         task_assign_msg = parse_task_assign_msg(task_assign_msg_str)
         # get the file name for the task file
         file_name = task_assign_msg.file_name
+
+        # indicate successfully get the file name
+        send_msg_to(conn, gen_message(SuccessRespondMsg()))
 
         # generate a unique file name to save the file
         receive_file_from(conn, file_name)
