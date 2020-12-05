@@ -5,6 +5,8 @@ import threading
 
 worker_tasks = dict()
 task_lock = threading.Lock()
+file_id = 0
+file_id_lock = threading.Lock()
 
 
 from website.setting import *
@@ -36,6 +38,8 @@ def classifier():
         suffix = file.filename.rsplit('.')[-1].lower()
 
         global worker_tasks
+        global file_id
+        global task_lock
         picked_worker = None
         min_num_tasks = sys.maxsize
 
@@ -48,9 +52,14 @@ def classifier():
             if num_tasks < min_num_tasks:
                 num_tasks = min_num_tasks
                 picked_worker = worker
+        file_id_lock.acquire()
+        if num_total_tasks == 0:
+            file_id = 0
+        file_id += 1
+        file_id_lock.release()
         if DEBUG:
-            print("New unique file id:" + str(num_total_tasks))
-        filename = secure_filename(str(num_total_tasks+1) + '.' + suffix)
+            print("New unique file id:" + str(file_id))
+        filename = secure_filename(str(file_id) + '.' + suffix)
         if picked_worker == None:
             return jsonify(result=result)
         else:
@@ -60,9 +69,8 @@ def classifier():
         task_lock.release()
 
 
-
         try:
-            #time.sleep(5*random.random())
+            time.sleep(5*random.random())
             result = image_recognition_with_worker(picked_worker, complete_filepath)
         except:
             result = "Recognition task failed!"
