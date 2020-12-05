@@ -20,7 +20,9 @@ $("#image-form").submit(function(event) {
       type: 'POST',
       success: function(data) {
         if(data['result'] == "Empty File!"){
-          alert("Invalid File");
+          alert("Invalid file");
+        }else if(data['result'] == "Recognition task failed!"){
+          alert("Recognition task failed!");
         }else{
           result = data['result'];
           var arrayToBeSorted = [];
