@@ -43,9 +43,12 @@ def receive_msg_from(connection: socket.socket) -> str:
         LOGGER.debug(f"received part of the message: {cur_recv}")
         total_recv = total_recv + cur_recv
 
-    LOGGER.info(f"total message Received: {repr(total_recv.decode(ENCODING))}")
+    # remove the MSG_ENDING_CHAR from total_recv
+    total_recv_clean = total_recv[:-1]
+    LOGGER.info(f"total message Received: "
+                f"{repr(total_recv_clean.decode(ENCODING))}")
 
-    return total_recv.decode(ENCODING)
+    return total_recv_clean.decode(ENCODING)
 
 
 def send_msg_to(connection: socket.socket, msg: str) -> None:
