@@ -2,6 +2,7 @@ import socket
 import threading
 import uuid
 
+from src.logging_util import Logger
 from src.socket_util import receive_file_from, send_msg_to, receive_msg_from
 from src.types import IRResult, Address, gen_message, IRResultMsg, parse_task_assign_msg, SuccessRespondMsg
 
@@ -10,6 +11,10 @@ from tensorflow.keras.applications.imagenet_utils import decode_predictions
 
 from PIL import Image
 import numpy as np
+
+
+# init the worker logger
+LOGGER = Logger(logging_from="WORKER")
 
 # the address of current worker
 # if it is localhost then it is for testing
@@ -48,25 +53,32 @@ def run_ir_protocol(conn: socket.socket) -> None:
     :param conn: the connection to the manager
     """
     with conn:
-        print("connected, executing IR"),
+        LOGGER.info("connected, executing IR"),
 
+        LOGGER.info("receiving the task assignment message")
         # receive information about this task assignment
         task_assign_msg_str = receive_msg_from(conn)
         task_assign_msg = parse_task_assign_msg(task_assign_msg_str)
         # get the file name for the task file
         file_name = task_assign_msg.file_name
 
+        LOGGER.info("sending success response")
         # indicate successfully get the file name
         send_msg_to(conn, gen_message(SuccessRespondMsg()))
 
+        LOGGER.info(f"receiving the image file, saving to {file_name}")
         # generate a unique file name to save the file
         receive_file_from(conn, file_name)
 
         # do image recognition
         ir_result = image_recognition(file_name)
+        LOGGER.info(f"obtained image recognition result {ir_result}")
 
+        LOGGER.info("sending image recognition result")
         # send the result
         send_msg_to(conn, gen_message(IRResultMsg(result=ir_result)))
+
+        LOGGER.info("protocol finished, disconnect")
 
 
 def run_ir_server():
@@ -75,13 +87,13 @@ def run_ir_server():
     This will get the task from the manager, perform image recognition on them,
     and return the result back to the manager
     """
-    print("Preparing Server")
+    LOGGER.info("Preparing Server")
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         # start the server on the worker address given
         s.bind((WORKER_ADDRESS.ip, WORKER_ADDRESS.port))
-        print("Server started on", WORKER_ADDRESS.ip,
-              "port:", WORKER_ADDRESS.port)
+        LOGGER.info(f"Server started on "
+                    f"{WORKER_ADDRESS.ip}:{WORKER_ADDRESS.port}")
 
         while True:
             s.listen()
