@@ -84,6 +84,8 @@ def receive_file_from(connection: socket.socket, save_file_name: str) -> None:
     connection.settimeout(TIMEOUT_TIME)
     LOGGER.debug(f"Setting timeout time to {TIMEOUT_TIME}")
 
+    LOGGER.info(f"starting to receive file")
+
     with open(save_file_name, 'wb') as f:
 
         # keeps receiving and write to file until there is nothing else
@@ -97,3 +99,5 @@ def receive_file_from(connection: socket.socket, save_file_name: str) -> None:
 
             # write the currently received data to file
             f.write(data_recv)
+
+    LOGGER.info(f"file recieved and saved to {save_file_name}")
