@@ -20,7 +20,7 @@ def image_recognition(file_name: str) -> IRResult:
     return {"dog": 1.0}
 
 
-def run_ir_protocol(conn: socket.socket) -> None:
+def run_ir_protocol(conn: socket.socket, addr) -> None:
     """perform the image recognition protocol with the manager
 
     :param conn: the connection to the manager
