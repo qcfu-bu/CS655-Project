@@ -27,15 +27,19 @@ def receive_msg_from(connection: socket.socket) -> str:
     LOGGER.debug(f"Setting timeout time to {TIMEOUT_TIME} seconds")
 
     LOGGER.info(f"receiving message from connection")
+
     total_recv = b""
-    while True:
+    # receive a packet first
+    cur_recv: bytes = connection.recv(DATA_CAP)
+    # if it is empty, then we exit,
+    # since empty packet indicates that the other side has disconnected
+    if cur_recv == b"":
+        raise ConnectionError("Other side has disconnected.")
+    # receives the rest of the package
+    while not cur_recv.endswith(MSG_ENDING_CHAR):
         cur_recv: bytes = connection.recv(DATA_CAP)
         LOGGER.debug(f"received part of the message: {cur_recv}")
-        if cur_recv.endswith(MSG_ENDING_CHAR):
-            total_recv = total_recv + cur_recv
-            break
-        else:
-            total_recv = total_recv + cur_recv
+        total_recv = total_recv + cur_recv
 
     LOGGER.info(f"total message Received: {total_recv.decode(ENCODING)}")
 
