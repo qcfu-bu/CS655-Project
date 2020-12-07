@@ -16,7 +16,8 @@ def image_recognition(file_name: str) -> IRResult:
 
     :param file_name: the name of the file to recognize
     """
-    pass
+    # TODO: sample output
+    return {"dog": 1.0}
 
 
 def run_ir_protocol(conn: socket.socket) -> None:
@@ -70,3 +71,6 @@ def run_ir_server():
             )
             ir_thread.start()
 
+
+if __name__ == "__main__":
+    run_ir_server()
