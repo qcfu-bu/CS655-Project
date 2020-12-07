@@ -55,7 +55,7 @@ def send_file_to(connection: socket.socket, send_file_name: str) -> None:
 
     with open(send_file_name, 'rb') as f:
         file_content = b'\n'.join(f.readlines())
-        connection.send(file_content)
+        connection.sendall(file_content)
 
 
 def receive_file_from(connection: socket.socket, save_file_name: str) -> None:
