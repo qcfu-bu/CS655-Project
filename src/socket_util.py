@@ -28,14 +28,16 @@ def receive_msg_from(connection: socket.socket) -> str:
 
     LOGGER.info(f"receiving message from connection")
 
-    total_recv = b""
     # receive a packet first
     cur_recv: bytes = connection.recv(DATA_CAP)
+    LOGGER.debug(f"received part of the message: {cur_recv}")
     # if it is empty, then we exit,
     # since empty packet indicates that the other side has disconnected
     if cur_recv == b"":
         raise ConnectionError("Other side has disconnected.")
+
     # receives the rest of the package
+    total_recv = cur_recv
     while not cur_recv.endswith(MSG_ENDING_CHAR):
         cur_recv: bytes = connection.recv(DATA_CAP)
         LOGGER.debug(f"received part of the message: {cur_recv}")
@@ -56,6 +58,7 @@ def send_msg_to(connection: socket.socket, msg: str) -> None:
     connection.settimeout(TIMEOUT_TIME)
     LOGGER.debug(f"Setting timeout time to {TIMEOUT_TIME} seconds")
 
+    LOGGER.info(f"sending message: {msg}")
     connection.sendall(msg.encode(ENCODING) + MSG_ENDING_CHAR)
 
 
