@@ -2,9 +2,9 @@ import socket
 import threading
 import uuid
 
-from .socket_util import receive_file_from, send_msg_to, receive_msg_from
+from src.socket_util import receive_file_from, send_msg_to, receive_msg_from
 
-from .shared import IRResult, Address, gen_message, IRResultMsg, parse_task_assign_msg, SuccessRespondMsg
+from src.shared import IRResult, Address, gen_message, IRResultMsg, parse_task_assign_msg, SuccessRespondMsg
 
 # the address of current worker
 # if it is localhost then it is for testing

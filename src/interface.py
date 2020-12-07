@@ -5,8 +5,8 @@ import socket
 import random
 from typing import Optional, NamedTuple, Dict, Set, List, Tuple
 
-from .socket_util import receive_msg_from, send_msg_to, send_file_to
-from .shared import Address, WORKER_ADDRESSES, \
+from src.socket_util import receive_msg_from, send_msg_to, send_file_to
+from src.shared import Address, WORKER_ADDRESSES, \
     gen_message, parse_worker_task_num_msg, \
     NewTaskToWorkerMsg, parse_ir_result_msg, IRResult, TaskAssignMessage, parse_success_respond_msg
 
