@@ -2,8 +2,7 @@
 # which will display the webpage to upload file
 # and it will communicate with the server to assign file.
 import socket
-import random
-from typing import Optional, NamedTuple, Dict, Set, List, Tuple
+from typing import Optional, List, Tuple
 
 from src.socket_util import receive_msg_from, send_msg_to, send_file_to
 from src.shared import Address, WORKER_ADDRESSES, \

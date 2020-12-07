@@ -13,7 +13,7 @@ import numpy as np
 
 # the address of current worker
 # if it is localhost then it is for testing
-WORKER_ADDRESS = Address("localhost", 96)
+WORKER_ADDRESS = Address("127.0.0.1", 96)
 
 model = keras.applications.MobileNetV2(weights='imagenet')
 
