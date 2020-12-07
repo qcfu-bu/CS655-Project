@@ -81,8 +81,8 @@ def classifier():
             worker_tasks[picked_worker] -= 1
         task_lock.release()
 
-        return jsonify(result=result)
-
+    return jsonify(result=result)
+ 
 
 def init_workers():
     global worker_tasks

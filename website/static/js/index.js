@@ -1,5 +1,6 @@
 function createTable(sortedResult){
   var table_body = $("#table-body");
+  $("#table-body").empty();
 
   for (var i = 1; i <= sortedResult.length; i++){
     var tr = $('<tr><th scope="row">' + i + '</th><td>' + sortedResult[i-1][0] + '</td><td>' + sortedResult[i-1][1] + '</td></tr>');
