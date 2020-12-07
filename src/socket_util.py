@@ -27,19 +27,28 @@ def receive_msg_from(connection: socket.socket) -> str:
     LOGGER.debug(f"Setting timeout time to {TIMEOUT_TIME} seconds")
 
     LOGGER.info(f"receiving message from connection")
-    total_recv = b""
-    while True:
+
+    # receive a packet first
+    cur_recv: bytes = connection.recv(DATA_CAP)
+    LOGGER.debug(f"received part of the message: {cur_recv}")
+    # if it is empty, then we exit,
+    # since empty packet indicates that the other side has disconnected
+    if cur_recv == b"":
+        raise ConnectionError("Other side has disconnected.")
+
+    # receives the rest of the package
+    total_recv = cur_recv
+    while not cur_recv.endswith(MSG_ENDING_CHAR):
         cur_recv: bytes = connection.recv(DATA_CAP)
         LOGGER.debug(f"received part of the message: {cur_recv}")
-        if cur_recv.endswith(MSG_ENDING_CHAR):
-            total_recv = total_recv + cur_recv
-            break
-        else:
-            total_recv = total_recv + cur_recv
+        total_recv = total_recv + cur_recv
 
-    LOGGER.info(f"total message Received: {total_recv.decode(ENCODING)}")
+    # remove the MSG_ENDING_CHAR from total_recv
+    total_recv_clean = total_recv[:-1]
+    LOGGER.info(f"total message Received: "
+                f"{repr(total_recv_clean.decode(ENCODING))}")
 
-    return total_recv.decode(ENCODING)
+    return total_recv_clean.decode(ENCODING)
 
 
 def send_msg_to(connection: socket.socket, msg: str) -> None:
@@ -52,6 +61,7 @@ def send_msg_to(connection: socket.socket, msg: str) -> None:
     connection.settimeout(TIMEOUT_TIME)
     LOGGER.debug(f"Setting timeout time to {TIMEOUT_TIME} seconds")
 
+    LOGGER.info(f"sending message: {repr(msg)}")
     connection.sendall(msg.encode(ENCODING) + MSG_ENDING_CHAR)
 
 
@@ -71,7 +81,7 @@ def send_file_to(connection: socket.socket, send_file_name: str) -> None:
         file_content = f.read()
     file_size = len(file_content)
 
-    LOGGER.debug(f"total file content size:\n{file_size}")
+    LOGGER.debug(f"total file content size: {file_size}")
     connection.sendall(struct.pack(">L", file_size) + file_content)
 
     LOGGER.info(f"finish sending file {send_file_name}")
@@ -99,7 +109,7 @@ def receive_file_from(connection: socket.socket, save_file_name: str) -> None:
     packed_msg_size = data_recv[:payload_size]
     data_recv = data_recv[payload_size:]
     msg_size = struct.unpack(">L", packed_msg_size)[0]
-    LOGGER.info("msg_size: {msg_size}")
+    LOGGER.info(f"msg_size: {msg_size}")
 
     while len(data_recv) < msg_size:
         data_recv += connection.recv(DATA_CAP)
@@ -109,4 +119,4 @@ def receive_file_from(connection: socket.socket, save_file_name: str) -> None:
     with open(save_file_name, 'wb') as f:
         f.write(data_recv)
 
-    LOGGER.info(f"file recieved and saved to {save_file_name}")
+    LOGGER.info(f"file received and saved to {save_file_name}")

@@ -2,6 +2,7 @@ from flask import Flask, request, url_for, render_template, jsonify, redirect
 import os, sys, json, socket, random, time
 from werkzeug.utils import secure_filename
 import threading
+import argparse
 
 worker_tasks = dict()
 task_lock = threading.Lock()
@@ -10,13 +11,12 @@ file_id_lock = threading.Lock()
 
 
 from website.setting import *
-from src.setting import WORKER_ADDRESSES
 from src.interface import *
 
 app = Flask(__name__)
 app.secret_key = "cs655"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
+worker_addresses = []
 
 @app.route('/', methods=['GET'])
 @app.route('/index', methods=['GET'])
@@ -46,12 +46,27 @@ def classifier():
         task_lock.acquire()
         # generate unique file id and pick the worker with minimum workload
         num_total_tasks = 0
+        tied_workers = []
         for worker in worker_tasks:
             num_tasks = worker_tasks[worker]
             num_total_tasks += num_tasks
             if num_tasks < min_num_tasks:
-                num_tasks = min_num_tasks
+                min_num_tasks = num_tasks
                 picked_worker = worker
+                tied_workers = []
+            elif num_tasks == min_num_tasks:
+                tied_workers.append(worker)
+
+        if len(tied_workers) != 0:
+            tied_workers.append(picked_worker)
+            picked_worker = random.choice(tied_workers)
+            if DEBUG:
+                print("There is a tie when picking the worker among the worker list " + str(tied_workers) + ". A random worker will be picked from them.")
+        if DEBUG:
+            print("Worker Task Status:")
+            for worker in worker_tasks:
+                print(str(worker) + "\t" + str(worker_tasks[worker]))
+            print("Assigning task to the worker " + str(worker))
         file_id_lock.acquire()
         if num_total_tasks == 0:
             file_id = 0
@@ -63,7 +78,7 @@ def classifier():
         if picked_worker == None:
             return jsonify(result=result)
         else:
-            worker_tasks[worker] += 1
+            worker_tasks[picked_worker] += 1
         complete_filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(complete_filepath)
         task_lock.release()
@@ -82,18 +97,50 @@ def classifier():
         task_lock.release()
 
     return jsonify(result=result)
- 
+
 
 def init_workers():
     global worker_tasks
-    for worker_addr in WORKER_ADDRESSES:
+    global worker_addresses
+    for worker_addr in worker_addresses:
         worker_tasks[worker_addr] = 0
 
 
-def main():
+def isPortValid(port):
+    return port >= 0 and port <= 65535
+
+
+def main(argv):
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-P','--port', type=int, help='port number',default=20000)
+    parser.add_argument('--json_conf', help='the json filepath that contains worker addresses ', default="workers.json")
+    args = parser.parse_args(argv)
+    # check valid port number:
+    _port = int(args.port)
+    if not isPortValid(_port):
+        print(_port)
+        print("Invalid port number: port number should be between 0 and 65535")
+        exit()
+    if not os.path.exists(args.json_conf):
+        print("Invalid json path!")
+        exit()
+    f = open(args.json_conf)
+    conf = json.load(f)
+    global worker_addresses
+    for address in conf:
+        if "ip" in address and "port" in address:
+            if isPortValid(address["port"]):
+                worker_addresses.append(Address(address["ip"],address["port"]))
+            else:
+                print("Invalid worker port number: port number should be between 0 and 65535")
+                exit()
+        else:
+            print("Invalid json format: ip or port has to be specified for an address")
+            exit()
+
     init_workers()
     print("Web starts")
-    app.run(host= '127.0.0.1', debug=DEBUG, port=20000, threaded=True)
+    app.run(host= '0.0.0.0', debug=DEBUG, port=args.port, threaded=True)
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
