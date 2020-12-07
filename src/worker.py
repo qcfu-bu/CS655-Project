@@ -4,7 +4,7 @@ import uuid
 
 from src.logging_util import Logger
 from src.socket_util import receive_file_from, send_msg_to, receive_msg_from
-from src.types import IRResult, Address, gen_message, IRResultMsg, parse_task_assign_msg, SuccessRespondMsg
+from src.worker_interface_types import IRResult, Address, gen_message, IRResultMsg, parse_task_assign_msg, SuccessRespondMsg
 
 from tensorflow import keras
 from tensorflow.keras.applications.imagenet_utils import decode_predictions

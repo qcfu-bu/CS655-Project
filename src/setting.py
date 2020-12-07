@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from src.types import Address
+from src.worker_interface_types import Address
 
 # the logging setting for worker interface communication
 # other setting can be set in logging_util
