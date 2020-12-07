@@ -109,4 +109,4 @@ def receive_file_from(connection: socket.socket, save_file_name: str) -> None:
     with open(save_file_name, 'wb') as f:
         f.write(data_recv)
 
-    LOGGER.info(f"file recieved and saved to {save_file_name}")
+    LOGGER.info(f"file received and saved to {save_file_name}")
