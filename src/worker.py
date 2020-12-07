@@ -11,14 +11,11 @@ from tensorflow.keras.applications.imagenet_utils import decode_predictions
 
 from PIL import Image
 import numpy as np
+import argparse
 
 
 # init the worker logger
 LOGGER = Logger(logging_from="WORKER")
-
-# the address of current worker
-# if it is localhost then it is for testing
-WORKER_ADDRESS = Address("127.0.0.1", 65000)
 
 model = keras.applications.MobileNetV2(weights='imagenet')
 
@@ -80,7 +77,7 @@ def run_ir_protocol(conn: socket.socket) -> None:
         LOGGER.info("protocol finished, disconnect")
 
 
-def run_ir_server():
+def run_ir_server(worker_address):
     """Run the image recognition server on the worker.
 
     This will get the task from the manager, perform image recognition on them,
@@ -90,9 +87,9 @@ def run_ir_server():
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         # start the server on the worker address given
-        s.bind((WORKER_ADDRESS.ip, WORKER_ADDRESS.port))
+        s.bind((worker_address.ip, worker_address.port))
         LOGGER.info(f"Server started on "
-                    f"{WORKER_ADDRESS.ip}:{WORKER_ADDRESS.port}")
+                    f"{worker_address.ip}:{worker_address.port}")
 
         while True:
             s.listen()
@@ -106,4 +103,17 @@ def run_ir_server():
 
 
 if __name__ == "__main__":
-    run_ir_server()
+    parser = argparse.ArgumentParser('Worker')
+    parser.add_argument('--port', help='interface port', default=65000,type=int)
+    parser.add_argument('--ip', help='interface ip', default='127.0.0.1')
+    args = parser.parse_args()
+
+    # check valid port number:
+    _port = int(args.port)
+    if _port < 0 or _port > 65535:
+        print("Invalid port number: port number should be between 0 and 65535")
+        exit()
+    # the address of current worker
+    # if it is localhost then it is for testing
+    #WORKER_ADDRESS = Address(args.ip, args.port)
+    run_ir_server(Address(args.ip,args.port))
