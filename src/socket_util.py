@@ -6,7 +6,7 @@ from src.logging_util import Logger
 
 K = 1024
 
-TIMEOUT_TIME = 60  # seconds
+TIMEOUT_TIME = 0.01  # seconds
 
 DATA_CAP = 1 * K  # data to send in a single packet
 ENCODING = 'utf-8'  # use utf-8 for text encoding
@@ -99,7 +99,7 @@ def receive_file_from(connection: socket.socket, save_file_name: str) -> None:
     packed_msg_size = data_recv[:payload_size]
     data_recv = data_recv[payload_size:]
     msg_size = struct.unpack(">L", packed_msg_size)[0]
-    LOGGER.info("msg_size: {msg_size}")
+    LOGGER.info(f"msg_size: {msg_size}")
 
     while len(data_recv) < msg_size:
         data_recv += connection.recv(DATA_CAP)
