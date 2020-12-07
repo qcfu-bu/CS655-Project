@@ -14,13 +14,6 @@ class Address(NamedTuple):
 # if it is localhost, then it is for testing purpose.
 INTERFACE_ADDRESS = Address("localhost", 5000)
 
-# list of worker addresses
-# if it is localhost, then it is for testing purpose.
-WORKER_ADDRESSES: List[Address] = [
-    Address("127.0.0.1", 69)
-]
-
-
 IRResult = Dict[str, float]
 
 

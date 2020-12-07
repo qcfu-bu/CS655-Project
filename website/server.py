@@ -10,7 +10,7 @@ file_id_lock = threading.Lock()
 
 
 from website.setting import *
-from src.shared import WORKER_ADDRESSES
+from src.setting import WORKER_ADDRESSES
 from src.interface import *
 
 app = Flask(__name__)
