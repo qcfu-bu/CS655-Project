@@ -6,7 +6,7 @@ from src.logging_util import Logger
 
 K = 1024
 
-TIMEOUT_TIME = 0.01  # seconds
+TIMEOUT_TIME = 60  # seconds
 
 DATA_CAP = 1 * K  # data to send in a single packet
 ENCODING = 'utf-8'  # use utf-8 for text encoding
