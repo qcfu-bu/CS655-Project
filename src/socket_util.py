@@ -5,7 +5,7 @@ from src.logging_util import Logger
 
 K = 1024
 
-TIMEOUT_TIME = 10  # seconds
+TIMEOUT_TIME = 60  # seconds
 
 DATA_CAP = 1 * K  # data to send in a single packet
 ENCODING = 'utf-8'  # use utf-8 for text encoding
@@ -23,7 +23,7 @@ def receive_msg_from(connection: socket.socket) -> str:
     """
     # setting the timeout time
     connection.settimeout(TIMEOUT_TIME)
-    LOGGER.debug(f"Setting timeout time to {TIMEOUT_TIME}")
+    LOGGER.debug(f"Setting timeout time to {TIMEOUT_TIME} seconds")
 
     LOGGER.info(f"receiving message from connection")
     total_recv = b""
@@ -49,7 +49,7 @@ def send_msg_to(connection: socket.socket, msg: str) -> None:
     """
     # setting the timeout time
     connection.settimeout(TIMEOUT_TIME)
-    LOGGER.debug(f"Setting timeout time to {TIMEOUT_TIME}")
+    LOGGER.debug(f"Setting timeout time to {TIMEOUT_TIME} seconds")
 
     connection.sendall(msg.encode(ENCODING) + MSG_ENDING_CHAR)
 
@@ -62,14 +62,14 @@ def send_file_to(connection: socket.socket, send_file_name: str) -> None:
     """
     # setting the timeout time
     connection.settimeout(TIMEOUT_TIME)
-    LOGGER.debug(f"Setting timeout time to {TIMEOUT_TIME}")
+    LOGGER.debug(f"Setting timeout time to {TIMEOUT_TIME} seconds")
 
     LOGGER.info(f"Starting to send file {send_file_name}")
 
     with open(send_file_name, 'rb') as f:
         file_content = f.read()
-        LOGGER.debug(f"total file content:\n{file_content}")
-        connection.sendall(file_content)
+    LOGGER.debug(f"total file content:\n{file_content}")
+    connection.sendall(file_content)
 
     LOGGER.info(f"finish sending file {send_file_name}")
 
@@ -82,7 +82,7 @@ def receive_file_from(connection: socket.socket, save_file_name: str) -> None:
     """
     # setting the timeout time
     connection.settimeout(TIMEOUT_TIME)
-    LOGGER.debug(f"Setting timeout time to {TIMEOUT_TIME}")
+    LOGGER.debug(f"Setting timeout time to {TIMEOUT_TIME} seconds")
 
     LOGGER.info(f"starting to receive file")
 
@@ -94,10 +94,10 @@ def receive_file_from(connection: socket.socket, save_file_name: str) -> None:
             data_recv = connection.recv(DATA_CAP)
             LOGGER.debug(f"received part of the message: {data_recv}")
 
-            if len(data_recv) < DATA_CAP:
-                break
-
             # write the currently received data to file
             f.write(data_recv)
+
+            if len(data_recv) < DATA_CAP:
+                break
 
     LOGGER.info(f"file recieved and saved to {save_file_name}")
