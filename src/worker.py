@@ -3,12 +3,19 @@ import threading
 import uuid
 
 from src.socket_util import receive_file_from, send_msg_to, receive_msg_from
-
 from src.shared import IRResult, Address, gen_message, IRResultMsg, parse_task_assign_msg, SuccessRespondMsg
+
+from tensorflow import keras
+from tensorflow.keras.applications.imagenet_utils import decode_predictions
+
+from PIL import Image
+import numpy as np
 
 # the address of current worker
 # if it is localhost then it is for testing
 WORKER_ADDRESS = Address("localhost", 96)
+
+model = keras.applications.MobileNetV2(weights='imagenet')
 
 
 def image_recognition(file_name: str) -> IRResult:
@@ -16,8 +23,23 @@ def image_recognition(file_name: str) -> IRResult:
 
     :param file_name: the name of the file to recognize
     """
-    # TODO: sample output
-    return {"dog": 1.0}
+
+    img = Image.open(file_name)
+    img = img.resize((224, 224))
+
+    data = np.asarray(img, dtype='float32').reshape((224, 224, 3))
+
+    data = np.expand_dims(data, 0)
+    data = keras.applications.mobilenet_v2.preprocess_input(data)
+
+    prediction = model.predict(data)
+    prediction = decode_predictions(prediction, 5)[0]
+
+    result = {}
+    for pred in prediction:
+        result[pred[1]] = str(pred[2])
+
+    return result
 
 
 def run_ir_protocol(conn: socket.socket) -> None:
