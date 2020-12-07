@@ -12,7 +12,7 @@ ENCODING = 'utf-8'  # use utf-8 for text encoding
 
 MSG_ENDING_CHAR = b'\n'  # this char signifies the ending of a message
 
-LOGGER = Logger(logging_keyword="SOCKET")
+LOGGER = Logger(logging_from="SOCKET")
 
 
 def receive_msg_from(connection: socket.socket) -> str:
