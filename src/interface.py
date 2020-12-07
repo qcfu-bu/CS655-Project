@@ -5,11 +5,9 @@ import socket
 from typing import Optional, List, Tuple
 
 from src.logging_util import Logger
-from src.setting import WORKER_ADDRESSES
 from src.socket_util import receive_msg_from, send_msg_to, send_file_to
 from src.types import Address, \
-    gen_message, parse_worker_task_num_msg, \
-    NewTaskToWorkerMsg, parse_ir_result_msg, IRResult, TaskAssignMessage, \
+    gen_message, parse_ir_result_msg, IRResult, TaskAssignMessage, \
     parse_success_respond_msg
 
 
