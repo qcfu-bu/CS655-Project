@@ -10,10 +10,12 @@ Members:
 ### How to run
 
 1. Make sure to use python version >= 3.6. Tested on Python 3.8.
-2. Make sure the newest Flask is installed (pip install Flask)
-3. At root dir, run 'source bin/activate && pip install -e .'
-
-4. run 'python website/server.py'
+2. Make sure the newest Flask is installed (`pip install Flask`)
+3. At root dir, run `source bin/activate && pip install -e .`
+4. On the server
+    1. run `python website/server.py`
+5. On each worker
+    1. run `python src/worker.py`
 
 ### Updates
 
