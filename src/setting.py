@@ -11,7 +11,7 @@ LOGGING_FILE = None
 # list of worker addresses
 # if it is localhost, then it is for testing purpose.
 WORKER_ADDRESSES: List[Address] = [
-    Address("127.0.0.1", 69)
+    Address("127.0.0.1", 65000)
 ]
 
 
