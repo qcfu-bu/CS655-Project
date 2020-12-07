@@ -27,9 +27,8 @@ def image_recognition(file_name: str) -> IRResult:
     img = Image.open(file_name)
     img = img.resize((224, 224))
 
-    data = np.asarray(img, dtype='float32').reshape((224, 224, 3))
-
-    data = np.expand_dims(data, 0)
+    data = np.array(img, dtype='float32')[:, :, :3]
+    data = data.reshape((1, 224, 224, 3))
     data = keras.applications.mobilenet_v2.preprocess_input(data)
 
     prediction = model.predict(data)

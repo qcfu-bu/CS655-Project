@@ -1,5 +1,6 @@
 # General Utility for socket uses
 import socket
+import struct
 
 from src.logging_util import Logger
 
@@ -68,8 +69,10 @@ def send_file_to(connection: socket.socket, send_file_name: str) -> None:
 
     with open(send_file_name, 'rb') as f:
         file_content = f.read()
-    LOGGER.debug(f"total file content:\n{file_content}")
-    connection.sendall(file_content)
+    file_size = len(file_content)
+
+    LOGGER.debug(f"total file content size:\n{file_size}")
+    connection.sendall(struct.pack(">L", file_size) + file_content)
 
     LOGGER.info(f"finish sending file {send_file_name}")
 
@@ -82,22 +85,28 @@ def receive_file_from(connection: socket.socket, save_file_name: str) -> None:
     """
     # setting the timeout time
     connection.settimeout(TIMEOUT_TIME)
-    LOGGER.debug(f"Setting timeout time to {TIMEOUT_TIME} seconds")
 
+    LOGGER.debug(f"Setting timeout time to {TIMEOUT_TIME} seconds")
     LOGGER.info(f"starting to receive file")
 
+    data_recv = b""
+    payload_size = struct.calcsize(">L")
+    LOGGER.info(f"Payload_size: {payload_size}")
+
+    while len(data_recv) < payload_size:
+        data_recv += connection.recv(DATA_CAP)
+
+    packed_msg_size = data_recv[:payload_size]
+    data_recv = data_recv[payload_size:]
+    msg_size = struct.unpack(">L", packed_msg_size)[0]
+    LOGGER.info("msg_size: {msg_size}")
+
+    while len(data_recv) < msg_size:
+        data_recv += connection.recv(DATA_CAP)
+
+    data_recv = data_recv[:msg_size]
+
     with open(save_file_name, 'wb') as f:
-
-        # keeps receiving and write to file until there is nothing else
-        # to receive.
-        while True:
-            data_recv = connection.recv(DATA_CAP)
-            LOGGER.debug(f"received part of the message: {data_recv}")
-
-            # write the currently received data to file
-            f.write(data_recv)
-
-            if len(data_recv) < DATA_CAP:
-                break
+        f.write(data_recv)
 
     LOGGER.info(f"file recieved and saved to {save_file_name}")
