@@ -67,7 +67,7 @@ def send_file_to(connection: socket.socket, send_file_name: str) -> None:
     LOGGER.info(f"Starting to send file {send_file_name}")
 
     with open(send_file_name, 'rb') as f:
-        file_content = b'\n'.join(f.readlines())
+        file_content = f.read()
         LOGGER.debug(f"total file content:\n{file_content}")
         connection.sendall(file_content)
 
