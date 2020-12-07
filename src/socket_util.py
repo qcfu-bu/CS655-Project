@@ -78,7 +78,7 @@ def send_file_to(connection: socket.socket, send_file_name: str) -> None:
         file_content = f.read()
     file_size = len(file_content)
 
-    LOGGER.debug(f"total file content size:\n{file_size}")
+    LOGGER.debug(f"total file content size: {file_size}")
     connection.sendall(struct.pack(">L", file_size) + file_content)
 
     LOGGER.info(f"finish sending file {send_file_name}")
