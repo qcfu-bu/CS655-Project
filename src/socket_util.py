@@ -43,7 +43,7 @@ def receive_msg_from(connection: socket.socket) -> str:
         LOGGER.debug(f"received part of the message: {cur_recv}")
         total_recv = total_recv + cur_recv
 
-    LOGGER.info(f"total message Received: {total_recv.decode(ENCODING)}")
+    LOGGER.info(f"total message Received: {repr(total_recv.decode(ENCODING))}")
 
     return total_recv.decode(ENCODING)
 
@@ -58,7 +58,7 @@ def send_msg_to(connection: socket.socket, msg: str) -> None:
     connection.settimeout(TIMEOUT_TIME)
     LOGGER.debug(f"Setting timeout time to {TIMEOUT_TIME} seconds")
 
-    LOGGER.info(f"sending message: {msg}")
+    LOGGER.info(f"sending message: {repr(msg)}")
     connection.sendall(msg.encode(ENCODING) + MSG_ENDING_CHAR)
 
 
