@@ -112,7 +112,7 @@ def isPortValid(port):
 
 def main(argv):
     parser = argparse.ArgumentParser()
-    parser.add_argument('-P','--port', type=int, help='port number',default=20000)
+    parser.add_argument('-P','--port', type=int, help='port number',default=80)
     parser.add_argument('--json_conf', help='the json filepath that contains worker addresses ', default="workers.json")
     args = parser.parse_args(argv)
     # check valid port number:
