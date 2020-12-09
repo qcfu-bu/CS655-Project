@@ -12,7 +12,7 @@ Members:
 Following instruction are for running on Ubuntu:
 1. Make sure to use python version >= 3.6.
 2. Make sure the newest Flask is installed (`pip3 install Flask`)
-3. At root dir, run `source bin/activate && pip3 install -e .`
+3. At root dir, run `pip3 install -e .`
 4. On the server
     1. run `python3 website/server.py`
 5. On each worker
